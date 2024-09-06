@@ -1,24 +1,21 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+/* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs');
+const path = require('path');
 
-// Получаем __dirname для ES-модулей
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const migrationsDir = path.resolve(__dirname, 'migrations');
 
 async function runMigration(direction, migrationFile) {
-  const { up, down } = await import(`./migrations/${migrationFile}`);
+  const migration = require(`./migrations/${migrationFile}`);
   console.log(`We are performing migration: ${migrationFile}`);
 
   if (direction === 'up') {
-    await up();
+    await migration.up();
   } else if (direction === 'down') {
-    await down();
+    await migration.down();
   }
 }
 
 async function run(direction = 'up') {
-  const migrationsDir = path.resolve(__dirname, 'migrations');
   const migrationFiles = fs.readdirSync(migrationsDir);
 
   for (const file of migrationFiles) {

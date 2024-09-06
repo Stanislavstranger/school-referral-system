@@ -14,6 +14,7 @@ export class RegisterDto {
   @IsString()
   lastName: string;
 
+  @IsOptional()
   @IsString()
   patronymic?: string;
 

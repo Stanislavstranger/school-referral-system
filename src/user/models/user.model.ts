@@ -21,7 +21,7 @@ export class UserLessons extends Document implements IUserLessons {
 }
 
 export const UserLessonsSchema = SchemaFactory.createForClass(UserLessons);
-@Schema()
+@Schema({ timestamps: true })
 export class User extends Document implements IUser {
   @Prop({ required: true })
   displayName: string;
@@ -35,7 +35,10 @@ export class User extends Document implements IUser {
   @Prop({ required: false })
   patronymic?: string;
 
-  @Prop({ required: true })
+  @Prop({
+    required: true,
+    unique: true,
+  })
   email: string;
 
   @Prop({ required: true })
@@ -47,7 +50,10 @@ export class User extends Document implements IUser {
   @Prop({ unique: true, required: true })
   referralCode: string;
 
-  @Prop()
+  @Prop({
+    type: [String],
+    _id: false,
+  })
   invitedStudents: string[];
 
   @Prop({
@@ -63,15 +69,6 @@ export class User extends Document implements IUser {
     _id: false,
   })
   lessons?: Types.Array<UserLessons>;
-
-  @Prop({ required: true })
-  version: number;
-
-  @Prop({ required: true })
-  createdAt: number;
-
-  @Prop({ required: true })
-  updatedAt: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

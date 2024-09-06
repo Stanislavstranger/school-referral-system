@@ -28,7 +28,4 @@ export interface IUser {
   invitedStudents?: string[];
   role: UserRole;
   lessons?: IUserLessons[];
-  version: number;
-  createdAt: number;
-  updatedAt: number;
 }

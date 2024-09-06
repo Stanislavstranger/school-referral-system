@@ -1,4 +1,4 @@
-import { Exclude, Transform } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import { SUCH_A_RESERVATION_ALREADY_EXISTS } from '../constants/user.constants';
 import {
   IUser,
@@ -23,25 +23,11 @@ export class UserEntity implements IUser {
   invitedStudents?: string[];
   role: UserRole;
   lessons?: IUserLessons[];
-  version: number;
-  @Transform(({ value }) => new Date(value).getTime())
-  createdAt: number;
-  @Transform(({ value }) => new Date(value).getTime())
-  updatedAt: number;
 
-  constructor(
-    user: Omit<
-      IUser,
-      'passwordHash' | 'referralCode' | 'version' | 'createdAt' | 'updatedAt'
-    >,
-  );
+  constructor(user: Omit<IUser, 'passwordHash' | 'referralCode'>);
   constructor(user: IUser);
 
-  constructor(
-    user:
-      | IUser
-      | Omit<IUser, 'passwordHash' | 'version' | 'createdAt' | 'updatedAt'>,
-  ) {
+  constructor(user: IUser | Omit<IUser, 'passwordHash'>) {
     this._id = user._id;
     this.displayName = user.displayName;
     this.firstName = user.firstName;
@@ -53,9 +39,6 @@ export class UserEntity implements IUser {
     this.lessons = user.lessons || [];
     this.referralCode = user.referralCode || this.generateReferralCode();
     this.invitedStudents = user.invitedStudents || [];
-    this.version = 1;
-    this.createdAt = Date.now();
-    this.updatedAt = Date.now();
 
     if ('passwordHash' in user) {
       this.passwordHash = user.passwordHash;
@@ -92,10 +75,7 @@ export class UserEntity implements IUser {
   }
 
   public async getPublicProfile(): Promise<
-    Omit<
-      IUser,
-      'passwordHash' | 'invitedStudents' | 'version' | 'createdAt' | 'updatedAt'
-    >
+    Omit<IUser, 'passwordHash' | 'invitedStudents'>
   > {
     return {
       displayName: this.displayName,

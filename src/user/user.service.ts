@@ -8,6 +8,7 @@ import { UserRepository } from './repositories/user.repository';
 import {
   INVALID_REFERRAL_CODE,
   THIS_USER_ALREADY_REGISTERED,
+  THIS_USER_NOT_FOUND,
 } from './constants/user.constants';
 import { UserEntity } from './entities/user.entity';
 
@@ -32,7 +33,7 @@ export class UserService {
       createUserDto.email,
     );
     if (oldUser) {
-      throw new NotFoundException(THIS_USER_ALREADY_REGISTERED);
+      throw new BadRequestException(THIS_USER_ALREADY_REGISTERED);
     }
 
     const newUserEntity = await new UserEntity(createUserDto).setPassword(
@@ -59,6 +60,9 @@ export class UserService {
 
   async findOne(id: string) {
     const user = await this.userRepository.findUserById(id);
+    if (!user) {
+      throw new NotFoundException(THIS_USER_NOT_FOUND);
+    }
     const profile = await new UserEntity(user).getPublicProfile();
     return { profile };
   }

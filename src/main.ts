@@ -2,11 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { setupSwagger } from './user/configs/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+
+  setupSwagger(app);
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 4000;

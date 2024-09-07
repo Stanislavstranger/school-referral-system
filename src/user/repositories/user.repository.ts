@@ -1,9 +1,14 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../models/user.model';
-import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { isValidObjectId, Model } from 'mongoose';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { IUser } from '../interfaces/user.interface';
 import { UserEntity } from '../entities/user.entity';
+import { THIS_USER_NOT_FOUND } from '../constants/user.constants';
 
 @Injectable()
 export class UserRepository {
@@ -29,27 +34,13 @@ export class UserRepository {
   }
 
   async findUserById(id: string): Promise<Omit<IUser, 'passwordHash'>> {
-    return this.userModel
-      .findById(id)
-      .select({
-        _id: true,
-        displayName: true,
-        firstName: true,
-        lastName: true,
-        patronymic: true,
-        email: true,
-        phone: true,
-        passwordHash: true,
-        referralCode: true,
-        invitedStudents: true,
-        role: true,
-        lessons: true,
-        version: true,
-        createdAt: true,
-        updatedAt: true,
-      })
-      .lean<Omit<IUser, 'passwordHash'>>()
-      .exec();
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    const user = this.userModel.findById(id).exec();
+    if (!user) throw new NotFoundException(THIS_USER_NOT_FOUND);
+    return user;
   }
 
   async findUserByReferralCode(referralCode: string) {
@@ -57,6 +48,10 @@ export class UserRepository {
   }
 
   async deleteUser(id: string): Promise<void> {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
     this.userModel.deleteOne({ _id: id }).exec();
   }
 }

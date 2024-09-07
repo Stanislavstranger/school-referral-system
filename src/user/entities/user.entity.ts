@@ -78,6 +78,7 @@ export class UserEntity implements IUser {
     Omit<IUser, 'passwordHash' | 'invitedStudents'>
   > {
     return {
+      _id: this._id,
       displayName: this.displayName,
       firstName: this.firstName,
       lastName: this.lastName,

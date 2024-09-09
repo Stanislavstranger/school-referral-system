@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { UserRole } from '../interfaces/user.interface';
+import { UserRole } from '../../user/interfaces/user.interface';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class RegisterDto {

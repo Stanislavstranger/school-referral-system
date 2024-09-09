@@ -19,7 +19,7 @@ export class LoginDto {
   password: string;
 }
 
-export class Response {
+export class ResponseLoginDto {
   @ApiProperty({
     description: "Access token for the student's account",
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',

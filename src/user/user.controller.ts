@@ -5,16 +5,26 @@ import {
   Delete,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiOperation, ApiResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { FindUserDto } from './dto/find-user.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 @ApiTags('User')
+@ApiBearerAuth('JWT')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Get()
   @ApiOperation({ summary: 'Get a list of all users' })
@@ -27,6 +37,7 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Get(':id')
   @ApiOperation({ summary: 'Get a single user by ID' })
@@ -41,6 +52,7 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a user by ID' })

@@ -1,57 +1,11 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { RegisterDto, ResponseRegisterDto } from './dto/register.dto';
 import { UserRepository } from './repositories/user.repository';
-import {
-  INVALID_REFERRAL_CODE,
-  THIS_USER_ALREADY_REGISTERED,
-  THIS_USER_NOT_FOUND,
-} from './constants/user.constants';
 import { UserEntity } from './entities/user.entity';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { THIS_USER_NOT_FOUND } from './constants/user.constants';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
-
-  async create(
-    createUserDto: RegisterDto,
-    referralCode?: string,
-  ): Promise<ResponseRegisterDto> {
-    let referrer = null;
-
-    if (referralCode) {
-      referrer = await this.userRepository.findUserByReferralCode(referralCode);
-      if (!referrer) {
-        throw new BadRequestException(INVALID_REFERRAL_CODE);
-      }
-    }
-
-    const oldUser = await this.userRepository.findUserByEmail(
-      createUserDto.email,
-    );
-    if (oldUser) {
-      throw new BadRequestException(THIS_USER_ALREADY_REGISTERED);
-    }
-
-    const newUserEntity = await new UserEntity(createUserDto).setPassword(
-      createUserDto.password,
-    );
-
-    const newUser = await this.userRepository.createUser(newUserEntity);
-
-    if (referrer) {
-      const invitedStudentId = String(newUser._id);
-      const userEntity = await new UserEntity(referrer).updateProfile(
-        invitedStudentId,
-      );
-      await this.userRepository.updateUser(userEntity);
-    }
-
-    return { email: newUser.email };
-  }
 
   async findAll() {
     const allUsers = await this.userRepository.findAllUser();

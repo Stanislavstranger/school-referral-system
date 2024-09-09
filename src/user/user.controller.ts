@@ -1,50 +1,19 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Param,
   Delete,
-  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { RegisterDto, ResponseRegisterDto } from './dto/register.dto';
-import {
-  ApiOperation,
-  ApiResponse,
-  ApiQuery,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { FindUserDto } from './dto/find-user.dto';
 
 @ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @UsePipes(new ValidationPipe())
-  @Post()
-  @ApiOperation({ summary: 'Register a new user' })
-  @ApiQuery({
-    name: 'referralCode',
-    required: false,
-    description: 'Referral code used for registration (optional)',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'User successfully created',
-    type: ResponseRegisterDto,
-  })
-  @ApiResponse({ status: 400, description: 'Bad Request - Invalid data input' })
-  create(
-    @Body() createUserDto: RegisterDto,
-    @Query('referralCode') referralCode?: string,
-  ) {
-    return this.userService.create(createUserDto, referralCode);
-  }
 
   @UsePipes(new ValidationPipe())
   @Get()

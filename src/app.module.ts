@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { getMongoConfig } from './configs/mongo.config';
 import { AuthModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
+import { StatisticsModule } from './statistics/statistics.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PaymentModule } from './payment/payment.module';
     MongooseModule.forRootAsync(getMongoConfig()),
     AuthModule,
     PaymentModule,
+    StatisticsModule,
   ],
   controllers: [],
   providers: [],

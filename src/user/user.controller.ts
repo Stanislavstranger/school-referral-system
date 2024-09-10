@@ -17,6 +17,9 @@ import {
 } from '@nestjs/swagger';
 import { FindUserDto } from './dto/find-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/decorators/roles.decorator';
+import { UserRole } from './interfaces/user.interface';
 
 @ApiTags('User')
 @ApiBearerAuth('JWT')
@@ -24,7 +27,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.Admin)
   @UsePipes(new ValidationPipe())
   @Get()
   @ApiOperation({ summary: 'Get a list of all users' })

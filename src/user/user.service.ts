@@ -2,6 +2,7 @@ import { UserRepository } from './repositories/user.repository';
 import { UserEntity } from './entities/user.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { THIS_USER_NOT_FOUND } from './constants/user.constants';
+import { AddPaymentDto } from 'src/payment/dto/add-payment.dto';
 
 @Injectable()
 export class UserService {
@@ -24,5 +25,47 @@ export class UserService {
   async remove(id: string) {
     await this.userRepository.deleteUser(id);
     return;
+  }
+
+  async handlePayment(addPaymentDto: AddPaymentDto) {
+    const { userId } = addPaymentDto;
+
+    const user = await this.userRepository.findUserById(userId);
+    if (!user) {
+      throw new NotFoundException(THIS_USER_NOT_FOUND);
+    }
+
+    const userEntity = new UserEntity(user);
+    const numberOfExistingLessons = userEntity.lessons.length + 1;
+
+    for (
+      let i = numberOfExistingLessons;
+      i < numberOfExistingLessons + 4;
+      i++
+    ) {
+      await userEntity.addLesson(`lesson-${i}`);
+    }
+
+    if (userEntity.parentReferralCode) {
+      const referrer = await this.userRepository.findUserByReferralCode(
+        userEntity.parentReferralCode,
+      );
+      if (referrer) {
+        const referrerEntity = new UserEntity(referrer);
+        const numberOfExistingLessons = referrerEntity.lessons.length + 1;
+
+        for (
+          let i = numberOfExistingLessons;
+          i < numberOfExistingLessons + 4;
+          i++
+        ) {
+          await referrerEntity.addLesson(`lesson-${i}`);
+        }
+        await this.userRepository.updateUserLesson(referrerEntity);
+      }
+    }
+
+    await this.userRepository.updateUser(userEntity);
+    return { message: 'Payment processed and lessons added' };
   }
 }

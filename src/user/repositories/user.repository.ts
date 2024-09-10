@@ -54,4 +54,8 @@ export class UserRepository {
 
     this.userModel.deleteOne({ _id: id }).exec();
   }
+
+  async updateUserLesson(user: UserEntity): Promise<void> {
+    await this.userModel.updateOne({ _id: user._id }, { $set: user }).exec();
+  }
 }

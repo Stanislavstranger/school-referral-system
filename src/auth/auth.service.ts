@@ -38,9 +38,10 @@ export class AuthService {
       throw new BadRequestException(THIS_USER_ALREADY_REGISTERED);
     }
 
-    const newUserEntity = await new UserEntity(createUserDto).setPassword(
-      createUserDto.password,
-    );
+    const newUserEntity = await new UserEntity({
+      ...createUserDto,
+      parentReferralCode: referrer ? referrer.referralCode : null,
+    }).setPassword(createUserDto.password);
 
     const newUser = await this.userRepository.createUser(newUserEntity);
 

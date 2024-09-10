@@ -25,6 +25,7 @@ export interface IUser {
   phone: string;
   passwordHash: string;
   referralCode: string;
+  parentReferralCode?: string;
   invitedStudents?: string[];
   role: UserRole;
   lessons?: IUserLessons[];

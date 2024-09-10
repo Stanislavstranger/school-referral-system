@@ -50,6 +50,9 @@ export class User extends Document implements IUser {
   @Prop({ unique: true, required: true })
   referralCode: string;
 
+  @Prop({ required: false })
+  parentReferralCode?: string;
+
   @Prop({
     type: [String],
     _id: false,

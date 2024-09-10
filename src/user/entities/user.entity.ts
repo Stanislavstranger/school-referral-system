@@ -1,5 +1,4 @@
 import { Exclude } from 'class-transformer';
-import { SUCH_A_RESERVATION_ALREADY_EXISTS } from '../constants/user.constants';
 import {
   IUser,
   UserRole,
@@ -20,6 +19,7 @@ export class UserEntity implements IUser {
   @Exclude()
   passwordHash: string;
   referralCode: string;
+  parentReferralCode?: string;
   invitedStudents?: string[];
   role: UserRole;
   lessons?: IUserLessons[];
@@ -38,6 +38,7 @@ export class UserEntity implements IUser {
     this.role = user.role || UserRole.Student;
     this.lessons = user.lessons || [];
     this.referralCode = user.referralCode || this.generateReferralCode();
+    this.parentReferralCode = user.parentReferralCode || null;
     this.invitedStudents = user.invitedStudents || [];
 
     if ('passwordHash' in user) {
@@ -45,19 +46,10 @@ export class UserEntity implements IUser {
     }
   }
 
-  private async isLessonExist(
-    lessonId: string,
-  ): Promise<IUserLessons | undefined> {
-    return this.lessons.find((lesson) => lesson.lessonId === lessonId);
-  }
-
   public async addLesson(lessonId: string) {
-    if (this.isLessonExist(lessonId)) {
-      throw new Error(SUCH_A_RESERVATION_ALREADY_EXISTS);
-    }
     this.lessons.push({
       lessonId,
-      purchaseState: PurchaseState.Started,
+      purchaseState: PurchaseState.Purchased,
     });
   }
 

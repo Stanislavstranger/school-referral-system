@@ -38,6 +38,17 @@ services:
       - referral-service-network
     volumes:
       - ./db:/data/db
+
+  redis:
+    container_name: redis
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.redis
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    networks:
+      - referral-service-network
 networks:
   referral-service-network:
     driver: bridge

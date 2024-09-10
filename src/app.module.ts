@@ -8,6 +8,8 @@ import { PaymentModule } from './payment/payment.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { LoggingMiddleware } from './middlewars/logging.middleware';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { CacheModule } from '@nestjs/cache-manager';
+import { getCacheConfig } from './configs/cache.config';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
     PrometheusModule.register({
       path: '/metrics',
     }),
+    CacheModule.registerAsync(getCacheConfig()),
   ],
   controllers: [],
   providers: [],

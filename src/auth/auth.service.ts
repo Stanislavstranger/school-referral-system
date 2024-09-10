@@ -72,8 +72,14 @@ export class AuthService {
   }
 
   async login(id: Pick<IUser, '_id'>): Promise<ResponseLoginDto> {
+    const user = await this.userRepository.findUserById(String(id));
+    const payload = {
+      username: user.firstName,
+      sub: user._id,
+      role: user.role,
+    };
     return {
-      access_token: await this.jwtService.signAsync({ id }),
+      access_token: await this.jwtService.signAsync(payload),
     };
   }
 }

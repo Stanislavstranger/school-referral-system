@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   INVALID_REFERRAL_CODE,
   THIS_USER_ALREADY_REGISTERED,
@@ -18,6 +18,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  private readonly logger = new Logger(AuthService.name);
+
   async register(
     createUserDto: RegisterDto,
     referralCode?: string,
@@ -27,6 +29,7 @@ export class AuthService {
     if (referralCode) {
       referrer = await this.userRepository.findUserByReferralCode(referralCode);
       if (!referrer) {
+        this.logger.error(`Invalid referral code: ${referrer}`);
         throw new BadRequestException(INVALID_REFERRAL_CODE);
       }
     }
@@ -35,6 +38,7 @@ export class AuthService {
       createUserDto.email,
     );
     if (oldUser) {
+      this.logger.error(`This user already registered: ${oldUser}`);
       throw new BadRequestException(THIS_USER_ALREADY_REGISTERED);
     }
 
@@ -52,7 +56,7 @@ export class AuthService {
       );
       await this.userRepository.updateUser(userEntity);
     }
-
+    this.logger.log(`User created: ${newUser}`);
     return { email: newUser.email };
   }
 
@@ -61,13 +65,16 @@ export class AuthService {
   }> {
     const user = await this.userRepository.findUserByEmail(email);
     if (!user) {
+      this.logger.error(`Incorrect login or password: ${user}`);
       throw new BadRequestException(INCORRECT_LOGIN_OR_PASSWORD);
     }
     const userEntity = new UserEntity(user);
     const isCorrectPassword = await userEntity.validatePassword(password);
     if (!isCorrectPassword) {
+      this.logger.error(`Incorrect login or password: ${isCorrectPassword}`);
       throw new BadRequestException(INCORRECT_LOGIN_OR_PASSWORD);
     }
+    this.logger.log(`User validated: ${user}`);
     return { id: user._id };
   }
 
@@ -78,6 +85,8 @@ export class AuthService {
       sub: user._id,
       role: user.role,
     };
+
+    this.logger.log(`User logged in: ${user}`);
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

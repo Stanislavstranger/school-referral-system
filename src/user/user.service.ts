@@ -1,6 +1,6 @@
 import { UserRepository } from './repositories/user.repository';
 import { UserEntity } from './entities/user.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { THIS_USER_NOT_FOUND } from './constants/user.constants';
 import { AddPaymentDto } from 'src/payment/dto/add-payment.dto';
 
@@ -8,22 +8,28 @@ import { AddPaymentDto } from 'src/payment/dto/add-payment.dto';
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
+  private readonly logger = new Logger(UserService.name);
+
   async findAll() {
     const allUsers = await this.userRepository.findAllUser();
+    this.logger.log(`Find all users`);
     return allUsers;
   }
 
   async findOne(id: string) {
     const user = await this.userRepository.findUserById(id);
     if (!user) {
+      this.logger.error(`This user not found: ${user}`);
       throw new NotFoundException(THIS_USER_NOT_FOUND);
     }
     const profile = await new UserEntity(user).getPublicProfile();
+    this.logger.error(`Return user with id: ${profile._id}`);
     return { profile };
   }
 
   async remove(id: string) {
     await this.userRepository.deleteUser(id);
+    this.logger.log(`Delete user with id: ${id}`);
     return;
   }
 
@@ -32,6 +38,7 @@ export class UserService {
 
     const user = await this.userRepository.findUserById(userId);
     if (!user) {
+      this.logger.error(`This user not found: ${user}`);
       throw new NotFoundException(THIS_USER_NOT_FOUND);
     }
 
@@ -66,6 +73,8 @@ export class UserService {
     }
 
     await this.userRepository.updateUser(userEntity);
+    this.logger.log(`Payment processed and lesson added: ${userEntity}`);
+
     return { message: 'Payment processed and lessons added' };
   }
 
@@ -92,6 +101,7 @@ export class UserService {
       },
     );
 
+    this.logger.log(`Referral statistics: ${referralStatistics}`);
     return referralStatistics;
   }
 }

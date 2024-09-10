@@ -1,6 +1,6 @@
 export enum UserRole {
-  Teacher = 'Teacher',
   Student = 'Student',
+  Admin = 'Admin',
 }
 
 export enum PurchaseState {

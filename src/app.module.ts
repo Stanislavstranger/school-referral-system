@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { PaymentModule } from './payment/payment.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { LoggingMiddleware } from './middlewars/logging.middleware';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
@@ -16,6 +17,9 @@ import { LoggingMiddleware } from './middlewars/logging.middleware';
     AuthModule,
     PaymentModule,
     StatisticsModule,
+    PrometheusModule.register({
+      path: '/metrics',
+    }),
   ],
   controllers: [],
   providers: [],

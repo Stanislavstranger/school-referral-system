@@ -4,6 +4,7 @@ import {
   Body,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { AddPaymentDto } from './dto/add-payment.dto';
 import {
@@ -13,6 +14,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserService } from 'src/user/user.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 @ApiTags('Payments')
 @ApiBearerAuth('JWT')
@@ -20,6 +22,7 @@ import { UserService } from 'src/user/user.service';
 export class PaymentController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post()
   @ApiOperation({ summary: 'Add payment and allocate lessons' })

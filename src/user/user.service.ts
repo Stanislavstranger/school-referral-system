@@ -68,4 +68,30 @@ export class UserService {
     await this.userRepository.updateUser(userEntity);
     return { message: 'Payment processed and lessons added' };
   }
+
+  async getReferralStatistics() {
+    const allUsers = await this.userRepository.findAllUser();
+
+    const invitedUsers = allUsers.filter((user) => user.parentReferralCode);
+
+    const referralStatistics = invitedUsers.reduce(
+      (acc, user) => {
+        acc.totalInvited += 1;
+
+        if (!acc.referrers[user.parentReferralCode]) {
+          acc.referrers[user.parentReferralCode] = 1;
+        } else {
+          acc.referrers[user.parentReferralCode] += 1;
+        }
+
+        return acc;
+      },
+      {
+        totalInvited: 0,
+        referrers: {},
+      },
+    );
+
+    return referralStatistics;
+  }
 }

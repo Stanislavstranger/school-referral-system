@@ -23,7 +23,7 @@ export class UserService {
       throw new NotFoundException(THIS_USER_NOT_FOUND);
     }
     const profile = await new UserEntity(user).getPublicProfile();
-    this.logger.error(`Return user with id: ${profile._id}`);
+    this.logger.log(`Return user with id: ${profile._id}`);
     return { profile };
   }
 

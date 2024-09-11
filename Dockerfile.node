@@ -1,0 +1,33 @@
+ARG NODE_VERSION=20-alpine
+
+FROM node:${NODE_VERSION} AS development
+USER node
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY --chown=node:node . .
+CMD ["npm", "run", "start:dev"]
+
+FROM node:${NODE_VERSION} AS build
+USER node
+WORKDIR /app
+
+COPY --chown=node:node --from=development /app/node_modules ./node_modules
+COPY --chown=node:node . .
+
+RUN npm run build
+
+ENV NODE_ENV production
+
+RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+
+FROM node:${NODE_VERSION} AS production
+USER node
+WORKDIR /app
+
+COPY --chown=node:node --from=build /app/node_modules ./node_modules
+COPY --chown=node:node --from=build /app/dist ./dist
+
+CMD ["node", "dist/main.js"]

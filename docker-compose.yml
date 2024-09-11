@@ -1,0 +1,57 @@
+version: '3.8'
+services:
+  referral-service:
+    container_name: referral-service
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+      target: ${NODE_ENV}
+    volumes:
+      - type: bind
+        source: ./src
+        target: /app/src
+    ports:
+      - '${PORT}:${PORT}'
+    environment:
+      PORT: ${PORT}
+      DATABASE_URL: ${DATABASE_URL}
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    networks:
+      - referral-service-network
+
+  mongo:
+    container_name: mongo
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.mongo
+    ports:
+      - '${MONGO_PORT}:${MONGO_PORT}'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_LOGIN}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    networks:
+      - referral-service-network
+    volumes:
+      - ./db:/data/db
+
+  redis:
+    container_name: redis
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.redis
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    networks:
+      - referral-service-network
+networks:
+  referral-service-network:
+    driver: bridge
+
+volumes:
+  mongodata:
